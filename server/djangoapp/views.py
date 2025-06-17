@@ -14,6 +14,8 @@ import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .restapis import get_request, analyze_review_sentiments, post_review
+from .models import CarMake, CarModel
+
 # from .populate import initiate
 
 
@@ -109,12 +111,14 @@ def get_dealer_reviews(request, dealer_id):
 # Create a `get_dealer_details` view to render the dealer details
 # def get_dealer_details(request, dealer_id):
 def get_dealer_details(request, dealer_id):
-    if(dealer_id):
+    if dealer_id:
         endpoint = "/fetchDealer/"+str(dealer_id)
         dealership = get_request(endpoint)
-        return JsonResponse({"status":200,"dealer":dealership})
+        return JsonResponse({"status": 200, "dealer": [dealership]})  # wrap it in a list!
     else:
-        return JsonResponse({"status":400,"message":"Bad Request"})
+        return JsonResponse({"status": 400, "message": "Bad Request"})
+
+
 
 # Create a `add_review` view to submit a review
 # def add_review(request):
@@ -128,3 +132,14 @@ def add_review(request):
             return JsonResponse({"status":401,"message":"Error in posting review"})
     else:
         return JsonResponse({"status":403,"message":"Unauthorized"})
+
+def get_cars(request):
+    count = CarMake.objects.filter().count()
+    print(count)
+    if(count == 0):
+        initiate()
+    car_models = CarModel.objects.select_related('car_make')
+    cars = []
+    for car_model in car_models:
+        cars.append({"CarModel": car_model.name, "CarMake": car_model.car_make.name})
+    return JsonResponse({"CarModels":cars})
