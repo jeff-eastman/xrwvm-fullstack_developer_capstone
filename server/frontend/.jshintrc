@@ -1,0 +1,11 @@
+{
+  "esversion": 8,
+  "node": true,
+  "browser": true,
+  "devel": true,
+  "globals": {
+    "require": true,
+    "module": true,
+    "__dirname": true
+  }
+}
